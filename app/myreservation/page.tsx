@@ -20,7 +20,7 @@ const MyReservationPage = async () => {
               Hi, {session.user.name}{" "}
             </h3>
             <p className="mt-1 font-medium mb-4">
-              Here&apos;s tour book history :
+              Here&apos;s your book history :
             </p>
           </div>
         </div>
