@@ -1,5 +1,4 @@
 import { put, del } from "@vercel/blob";
-import { request } from "http";
 import { NextResponse } from "next/server";
 
 export const PUT = async (request: Request) => {
