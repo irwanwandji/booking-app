@@ -9,7 +9,6 @@ import { BarLoader } from "react-spinners";
 import { Amenities } from "@prisma/client";
 import { RoomProps } from "@/types/room";
 import clsx from "clsx";
-import UpdateRoomPage from "@/app/admin/room/edit/[id]/page";
 
 const EditForm = ({
   amenities,
