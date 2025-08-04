@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useActionState } from "react";
 import { addDays } from "date-fns";
 import DatePicker from "react-datepicker";
@@ -14,87 +15,100 @@ const ReserveForm = ({
   room: RoomDetailProps;
   disabledDate: DisabledDateProps[];
 }) => {
-  const StartDate = new Date();
-  const EndDate = addDays(StartDate, 1);
+  const today = new Date();
+  const tomorrow = addDays(today, 1);
 
-  const [startDate, setStartDate] = useState(StartDate);
-  const [endDate, setEndDate] = useState(EndDate);
+  const [startDate, setStartDate] = useState<Date | null>(today);
+  const [endDate, setEndDate] = useState<Date | null>(tomorrow);
 
   const handleDateChange = (dates: [Date | null, Date | null]) => {
     const [start, end] = dates;
-    setStartDate(start ?? StartDate);
-    setEndDate(end ?? EndDate);
+    setStartDate(start);
+    setEndDate(end);
   };
 
+  // const [state, formAction, isPending] = useActionState(
+  //   createReserve.bind(null, room.id, room.price, startDate, endDate),
+  //   null
+  // );
+
   const [state, formAction, isPending] = useActionState(
-    createReserve.bind(null, room.id, room.price, startDate, endDate),
+    createReserve.bind(
+      null,
+      room.id,
+      room.price,
+      startDate ?? new Date(),
+      endDate ?? addDays(new Date(), 1)
+    ),
     null
   );
 
-  const excludeDates = disabledDate.map((item) => {
-    return {
-      start: item.startDate,
-      end: item.endDate,
-    };
-  });
+  const excludeDates = disabledDate.map((item) => ({
+    start: new Date(item.startDate),
+    end: new Date(item.endDate),
+  }));
 
   return (
     <div>
-      <form action={formAction}>
-        <div className="mb-4">
+      <form action={formAction} className="space-y-4">
+        <div>
           <label className="block mb-2 text-sm font-medium text-gray-900">
             Arrival - Departure
           </label>
           <DatePicker
             selected={startDate}
+            onChange={handleDateChange}
             startDate={startDate}
             endDate={endDate}
+            selectsRange
             minDate={new Date()}
-            selectsRange={true}
-            onChange={handleDateChange}
             excludeDateIntervals={excludeDates}
-            dateFormat={"dd-MM-YYYY"}
-            wrapperClassName="w-full"
+            dateFormat="dd-MM-yyyy"
             className="py-2 px-4 rounded-md border border-gray-300 w-full"
+            wrapperClassName="w-full"
+            placeholderText="Pilih tanggal kedatangan dan pulang"
           />
-          <div aria-live="polite" aria-atomic="true">
-            <p className="text-sm text-red-500 mt-2">{state?.messageDate}</p>
-          </div>
+          {state?.messageDate && (
+            <p className="text-sm text-red-500 mt-2">{state.messageDate}</p>
+          )}
         </div>
-        <div className="mb-4">
+
+        <div>
           <label className="block mb-2 text-sm font-medium text-gray-900">
             Your Name
           </label>
           <input
             type="text"
             name="name"
-            className="py-2 px-4 rounded-md border border-gray-300 w-full"
             placeholder="Full Name..."
+            className="py-2 px-4 rounded-md border border-gray-300 w-full"
           />
-          <div aria-live="polite" aria-atomic="true">
-            <p className="text-sm text-red-500 mt-2">{state?.error?.name}</p>
-          </div>
+          {state?.error?.name && (
+            <p className="text-sm text-red-500 mt-2">{state.error.name}</p>
+          )}
         </div>
-        <div className="mb-4">
+
+        <div>
           <label className="block mb-2 text-sm font-medium text-gray-900">
             Phone Number
           </label>
           <input
             type="text"
             name="phone"
-            className="py-2 px-4 rounded-md border border-gray-300 w-full"
             placeholder="Phone Number..."
+            className="py-2 px-4 rounded-md border border-gray-300 w-full"
           />
-          <div aria-live="polite" aria-atomic="true">
-            <p className="text-sm text-red-500 mt-2">{state?.error?.phone}</p>
-          </div>
+          {state?.error?.phone && (
+            <p className="text-sm text-red-500 mt-2">{state.error.phone}</p>
+          )}
         </div>
+
         <button
           type="submit"
           className={clsx(
-            "px-10 py-3 text-center font-semibold text-white w-full bg-orange-400 rounded-sm cursor-pointer hover:*:bg-orange-500",
+            "px-10 py-3 text-center font-semibold text-white w-full bg-orange-400 rounded-sm hover:bg-orange-500",
             {
-              "opacity-50 cursor-progress": isPending,
+              "opacity-50 cursor-not-allowed": isPending,
             }
           )}
           disabled={isPending}
